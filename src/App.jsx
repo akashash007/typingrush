@@ -498,7 +498,7 @@ function Game() {
           {/* Settings: difficulty mode (locked during a run) */}
           <div className="flex items-center gap-2">
             <span className="hidden xs:inline text-xs text-slate-400">Mode:</span>
-            <div className={"flex overflow-hidden rounded-md border border-slate-700 " + (ui.started ? "opacity-60 pointer-events-none" : "")}>
+            <div className={"flex flex-col md:flex-row overflow-hidden rounded-md border border-slate-700 " + (ui.started ? "opacity-60 pointer-events-none" : "")}>
               {Object.keys(MODES).map((key) => {
                 const active = ui.mode === key;
                 return (
