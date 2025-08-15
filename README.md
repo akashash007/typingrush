@@ -1,12 +1,28 @@
-# React + Vite
+# Typing Rush — React + Vite + Tailwind
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A fast, juicy typing game built with React (Vite) and Tailwind CSS.  
+Type falling words to destroy them. Use **power words** and switch **modes** to crank the chaos. Fully mobile-ready.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **4 Modes**: Easy (stage-based word lists), Medium, Hard, **Extreme** (double words like `car bike`)
+- **Powers (guaranteed every 15 spawns)**:
+  - `SLOW` → bullet-time (0.2× speed; spawn rate slows too)
+  - `POWER` → +1 heart when you type it fully
+- **True Pause**: game loop fully stops; SLOW timer doesn’t drain while paused
+- **Per-Mode High Scores**: stored in `localStorage` (`easy`, `medium`, `hard`, `extreme`)
+- **Mobile Responsive**: sticky typing bar, safe-area padding, responsive word sizes
+- **Confetti**: small pop when beating the current mode’s high; big blast on new best at Game Over
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🚀 Quick start
+
+> Requirements: Node **18+**
+
+```bash
+# 1) Create + install (if you haven't already)
+npm create vite@latest
+# choose React + JavaScript
+cd <your-project>
+npm install
