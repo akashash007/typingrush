@@ -81,7 +81,7 @@ const MODES = {
   easy: { label: "Easy", speedMul: 0.85, spawnRateMul: 0.90, extreme: false },
   medium: { label: "Medium", speedMul: 1.00, spawnRateMul: 1.00, extreme: false },
   hard: { label: "Hard", speedMul: 1.20, spawnRateMul: 1.15, extreme: false },
-  extreme: { label: "Extreme", speedMul: 1.35, spawnRateMul: 1.35, extreme: true }, // double words
+  // extreme: { label: "Extreme", speedMul: 1.35, spawnRateMul: 1.35, extreme: true }, // double words
 };
 
 /* ===== Confetti ===== */
@@ -195,6 +195,34 @@ function Game() {
     cancelAnimationFrame(rafId.current);
     rafId.current = requestAnimationFrame(loop);
     focusInputs();
+  };
+
+  // NEW: reset to *fresh* state (menu visible, mode buttons unlocked)
+  const resetGame = () => {
+    celebratedRef.current = false;
+    sincePowerRef.current = 0;
+    clearsRef.current = 0;
+    wordsRef.current = [];
+    selectedIdRef.current = null;
+    gameClock.current = 0;
+    lastTs.current = 0;
+    renderAccumulator.current = 0;
+    spawnAccumulator.current = 0;
+    setTyped("");
+    setFx([]);
+    cancelAnimationFrame(rafId.current);
+    setUi((s) => ({
+      ...s,
+      score: 0,
+      lives: 3,
+      combo: 0,
+      started: false,
+      paused: false,
+      gameOver: false,
+      slowUntil: 0,
+      // keep s.mode as-is so the user can change it freely before starting
+    }));
+    // Do NOT focus inputs here; we want the Start overlay (and mode picker) first
   };
 
   /* ----- Pause / Resume ----- */
@@ -498,7 +526,7 @@ function Game() {
                 {ui.started ? (ui.paused ? "Resume" : "Pause") : "Start"}
               </button>
               <button
-                onClick={startGame}
+                onClick={resetGame} // CHANGED: was startGame
                 className="rounded-md bg-slate-700 px-3 py-2 md:px-3 md:py-2 text-sm font-semibold hover:bg-slate-600 active:scale-[0.98]"
               >
                 Restart
@@ -575,7 +603,7 @@ function Game() {
           {/* Overlays */}
           {!ui.started && !ui.gameOver && (
             <CenterOverlay>
-              <h2 className="mb-2 text-2xl md:text-3xl font-extrabold tracking-tight">Typing Rush — Mobile Ready</h2>
+              <h2 className="mb-2 text-2xl md:text-3xl font-extrabold tracking-tight">Typing Rush</h2>
               <p className="mb-5 text-slate-300">Use power words wisely. Try Extreme on a big screen!</p>
               <button
                 onClick={startGame}
@@ -590,12 +618,21 @@ function Game() {
             <CenterOverlay>
               <h2 className="mb-2 text-2xl md:text-3xl font-extrabold">Paused</h2>
               <p className="mb-5 text-slate-300">Press Space / tap Resume.</p>
-              <button
-                onClick={pauseToggle}
-                className="rounded-lg bg-indigo-500 px-5 py-3 text-lg font-semibold shadow hover:bg-indigo-400 active:scale-[0.98]"
-              >
-                Resume
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={pauseToggle}
+                  className="rounded-lg bg-indigo-500 px-5 py-3 text-lg font-semibold shadow hover:bg-indigo-400 active:scale-[0.98]"
+                >
+                  Resume
+                </button>
+                {/* NEW: Main Menu from pause */}
+                <button
+                  onClick={resetGame}
+                  className="rounded-lg bg-slate-700 px-5 py-3 text-lg font-semibold shadow hover:bg-slate-600 active:scale-[0.98]"
+                >
+                  Main Menu
+                </button>
+              </div>
             </CenterOverlay>
           )}
 
@@ -608,12 +645,21 @@ function Game() {
               <p className="mb-5 text-slate-300">
                 Best ({currentModeLabel}): <span className="font-bold text-white">{currentHigh}</span>
               </p>
-              <button
-                onClick={startGame}
-                className="rounded-lg bg-indigo-500 px-5 py-3 text-lg font-semibold shadow hover:bg-indigo-400 active:scale-[0.98]"
-              >
-                Play Again
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={startGame}
+                  className="rounded-lg bg-indigo-500 px-5 py-3 text-lg font-semibold shadow hover:bg-indigo-400 active:scale-[0.98]"
+                >
+                  Play Again
+                </button>
+                {/* NEW: Back to Start overlay */}
+                <button
+                  onClick={resetGame}
+                  className="rounded-lg bg-slate-700 px-5 py-3 text-lg font-semibold shadow hover:bg-slate-600 active:scale-[0.98]"
+                >
+                  Main Menu
+                </button>
+              </div>
             </CenterOverlay>
           )}
 
