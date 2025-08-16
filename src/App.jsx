@@ -10,6 +10,11 @@ import confetti from "canvas-confetti";
  * - Easy mode uses stage word lists; Extreme spawns double words like "car bike"
  * - Guaranteed power every 15 spawns: SLOW (bullet-time), POWER (+1 heart)
  * - SLOW doesn't drain while paused; true pause; confetti on new per-mode high
+ *
+ * Bug fix:
+ * - Avoid stale-closure on ui.lives in the RAF loop by using a livesRef.
+ *   Without this, Play Again had to be clicked twice because the first new frame
+ *   still “saw” lives = 0 and immediately re-ended the game.
  */
 
 const CLAMP = (n, a, b) => Math.min(Math.max(n, a), b);
@@ -125,6 +130,9 @@ function Game() {
   const sincePowerRef = useRef(0); // spawns since last power
   const clearsRef = useRef(0);     // words destroyed (for easy stages)
 
+  // NEW: keep the latest lives in a ref to avoid stale closures inside RAF loop
+  const livesRef = useRef(3);
+
   /* ----- UI state ----- */
   const [ui, setUi] = useState({
     started: false,
@@ -146,6 +154,7 @@ function Game() {
 
   useEffect(() => { pausedRef.current = ui.paused; }, [ui.paused]);
   useEffect(() => { modeRef.current = ui.mode; }, [ui.mode]);
+  useEffect(() => { livesRef.current = ui.lives; }, [ui.lives]); // keep ref in sync
 
   /* ----- Game state ----- */
   const [typed, setTyped] = useState("");
@@ -182,6 +191,7 @@ function Game() {
     spawnAccumulator.current = 0;
     setTyped("");
     setFx([]);
+    livesRef.current = 3; // keep ref fresh for the very first RAF frame
     setUi((s) => ({
       ...s,
       score: 0,
@@ -210,6 +220,7 @@ function Game() {
     spawnAccumulator.current = 0;
     setTyped("");
     setFx([]);
+    livesRef.current = 3; // keep ref consistent
     cancelAnimationFrame(rafId.current);
     setUi((s) => ({
       ...s,
@@ -310,7 +321,8 @@ function Game() {
       setTyped("");
     }
 
-    if (ui.lives - missed <= 0) { endGame(); return; }
+    // IMPORTANT: use the ref, not the stale state
+    if (livesRef.current - missed <= 0) { endGame(); return; }
 
     // throttle UI re-render
     renderAccumulator.current += dt;
